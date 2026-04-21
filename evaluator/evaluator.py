@@ -1,7 +1,7 @@
 import os
 import urllib.request
 import array
-from core.models import Card
+from evaluator.models import Card
 
 class LookupEvaluator:
     """

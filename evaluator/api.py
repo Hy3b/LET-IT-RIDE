@@ -1,4 +1,4 @@
-from core.models import Card
+from evaluator.models import Card
 from evaluator.evaluator import LookupEvaluator
 from evaluator.ehs_calculator import EHSCalculator
 

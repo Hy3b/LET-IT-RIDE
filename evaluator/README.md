@@ -13,7 +13,7 @@ Con số này là nguyên liệu đầu vào sống còn để:
 ## 2. Các kỹ thuật tiên tiến đã áp dụng
 Module không dùng các câu lệnh rẽ nhánh `if/else` thủ công chậm chạp, mà áp dụng các tiêu chuẩn cao nhất của AI Poker thế giới:
 
-1. **Bitwise & Cactus Kev's Representation (`core/models.py`):**
+1. **Bitwise & Cactus Kev's Representation (`evaluator/models.py`):**
    - Không sử dụng Object hay Chuỗi ký tự (String) để lưu bài.
    - Mỗi lá bài được nén thành một số nguyên 32-bit `[xxxbbbbb|bbbbbbbb|cdhsrrrr|xxpppppp]`.
    - Giúp cho thao tác định giá trở nên siêu nhẹ và tốn 0 byte bộ nhớ thừa.
@@ -32,11 +32,7 @@ Module không dùng các câu lệnh rẽ nhánh `if/else` thủ công chậm ch
 
 ```text
 poker/
-├── core/
-│   ├── __init__.py
-│   └── models.py                 # (Step 1) Mã hóa lá bài thành 32-bit Int.
 ├── evaluator/
-│   ├── __init__.py
 │   ├── api.py                    # (Final Step) Interface gọn gàng nhất cho các team gọi hàm.
 │   ├── ehs_calculator.py         # (Step 3) Logic chạy Monte Carlo và Toán Tổ hợp.
 │   ├── evaluator.py              # (Step 2) Engine lõi: Đọc file HandRanks.dat.
@@ -80,7 +76,7 @@ Dưới đây là tóm tắt các bước hệ thống mà Thành viên 2 đã t
 ### Bước 1: Xây dựng cấu trúc dữ liệu lá bài siêu tốc (Bitwise)
 - **Vấn đề:** Máy tính tốn rất nhiều chu kỳ CPU để xử lý và so sánh chuỗi String (vd. `'Ah'`). Nếu chạy hàng triệu phép tính sẽ gây treo máy.
 - **Giải pháp:** Áp dụng thuật toán của **Cactus Kev**. Nén toàn bộ thông tin (Hạng, Chất, Cờ kiểm tra) của một lá bài vào một số nguyên 32-bit `[xxxbbbbb|bbbbbbbb|cdhsrrrr|xxpppppp]`.
-- **Kết quả:** Đã lập trình xong class `Card` tĩnh thao tác với Bitwise và class `Deck` chuẩn hóa bên trong `core/models.py`.
+- **Kết quả:** Đã lập trình xong class `Card` tĩnh thao tác với Bitwise và class `Deck` chuẩn hóa bên trong `evaluator/models.py`.
 
 ### Bước 2: Tích hợp Bộ Phân Loại Lookup Table O(1)
 - **Vấn đề:** Tự code logic bằng tay (so sánh tìm Đôi, Cù lú, Sảnh...) bằng IF/ELSE lồng nhau là ngõ cụt về mặt hiệu năng.

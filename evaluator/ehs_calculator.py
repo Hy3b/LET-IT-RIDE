@@ -1,6 +1,6 @@
 import random
 import itertools
-from core.models import Deck, Card
+from evaluator.models import Deck, Card
 from evaluator.evaluator import LookupEvaluator
 
 class EHSCalculator:
