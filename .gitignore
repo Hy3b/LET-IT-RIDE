@@ -1,0 +1,6 @@
+# Bỏ qua thư mục cache của Python
+__pycache__/
+*.py[cod]
+
+# TUYỆT ĐỐI BỎ QUA FILE NÀY VÌ GITHUB GIỚI HẠN 100MB (File table này nặng 130MB, ai chạy code sẽ tự động tải lại)
+evaluator/HandRanks.dat
