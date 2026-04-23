@@ -4,3 +4,7 @@ __pycache__/
 
 # TUYỆT ĐỐI BỎ QUA FILE NÀY VÌ GITHUB GIỚI HẠN 100MB (File table này nặng 130MB, ai chạy code sẽ tự động tải lại)
 evaluator/HandRanks.dat
+
+# Bỏ qua báo cáo và README theo yêu cầu
+Bao_cao_Houston_Poker.md
+README.md
