@@ -1,10 +1,14 @@
-# bayesian_update.py
-# Cập nhật xác suất bài đối thủ (Posterior)
-# Trách nhiệm:
-# Áp dụng định lý Bayes để cập nhật Range sau mỗi hành động của đối thủ.
-# P(Hand | Action) = [ P(Action | Hand) * P(Hand) ] / P(Action)
+"""Bayesian probability updater for opponent hand estimation.
+Uses Bayes' theorem to update probability distribution of opponent's hand
+based on their observed actions and hand strength.
+
+P(Hand | Action) = P(Action | Hand) * P(Hand) / P(Action)
+"""
 
 from .heuristics import get_action_likelihood
+from .ranges import HandRange
+from evaluator.api import EHS_API
+
 
 class BayesianUpdater:
     def __init__(self, hand_range, ehs_evaluator_func=None):
@@ -24,14 +28,29 @@ class BayesianUpdater:
             self.ehs_evaluator_func = ehs_evaluator_func
 
     def _mock_ehs_evaluator(self, hand, board_cards):
-        """Hàm giả lập EHS tạm thời để test độc lập phần 3."""
-        # Mô phỏng sức mạnh dựa trên lá bài cao
-        strength = 0.3
-        for card in hand:
-            if 'A' in card: strength += 0.3
-            elif 'K' in card: strength += 0.2
-            elif 'Q' in card: strength += 0.1
-        return min(strength, 1.0)
+        """
+        Default EHS estimator when core.engine is not provided.
+        Uses hand strength heuristic based on card values.
+        """
+        try:
+            # Try to use actual EHS from evaluator
+            hole_str = [f"{card[0]}{self._suit_to_char(card[1])}" for card in hand]
+            board_str = [f"{card[0]}{self._suit_to_char(card[1])}" for card in board_cards]
+            return EHS_API.get_score(hole_str, board_str, mc_simulations=500)
+        except:
+            # Fallback to simple heuristic
+            strength = 0.3
+            for card in hand:
+                if 'A' in str(card): strength += 0.3
+                elif 'K' in str(card): strength += 0.2
+                elif 'Q' in str(card): strength += 0.1
+            return min(strength, 1.0)
+    
+    @staticmethod
+    def _suit_to_char(suit):
+        """Convert suit symbol to character code."""
+        suit_map = {'\u2660': 's', '\u2665': 'h', '\u2666': 'd', '\u2663': 'c'}
+        return suit_map.get(suit, 's')
 
     def update_probabilities(self, action, board_cards):
         """

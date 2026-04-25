@@ -1,8 +1,8 @@
 import random
 from strategy.tree_node import InformationSetNode
-# Import giả định từ các module của thành viên khác
-# from modeling.ranges import sample_opponent_hand
-# from evaluator.ehs_calculator import evaluate_winner
+from modeling.ranges import HandRange
+from core.engine import monte_carlo_simulation, get_deck_remaining
+from evaluator.api import EHS_API
 
 class ISMCTS:
     def __init__(self, iterations=5000):
@@ -51,6 +51,14 @@ class ISMCTS:
         return best_child.parent_action
 
     def _get_belief_sample(self, state):
-        """Gọi sang Module Bayes của Thành viên 3 để dự đoán bài đối thủ"""
-        # return sample_opponent_hand(state.history, state.public_cards)
-        pass # Placeholder
+        """Sample opponent hand from belief distribution using Bayesian updater."""
+        # Get current belief state from state object
+        if hasattr(state, 'opponent_belief') and state.opponent_belief:
+            # Sample hand based on belief probabilities
+            return state.opponent_belief.sample_hand()
+        else:
+            # Fallback: uniform random hand from remaining cards
+            remaining = get_deck_remaining(state.player_hand, state.community)
+            if len(remaining) >= 2:
+                return random.sample(remaining, 2)
+            return []
