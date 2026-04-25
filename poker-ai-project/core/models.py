@@ -125,14 +125,17 @@ class Hand:
         # Determine hand category
         if straight and flush:
             category = 8  # Straight flush
+            groups = ranks  # Use ranks for straight flush
         elif freq == [4, 1]:
             category = 7  # Four of a kind
         elif freq == [3, 2]:
             category = 6  # Full house
         elif flush:
             category = 5  # Flush
+            groups = ranks  # Use ranks sorted high to low for flush
         elif straight:
             category = 4  # Straight
+            groups = ranks  # Use ranks for straight
         elif freq == [3, 1, 1]:
             category = 3  # Three of a kind
         elif freq == [2, 2, 1]:
@@ -141,6 +144,7 @@ class Hand:
             category = 1  # One pair
         else:
             category = 0  # High card
+            groups = ranks  # Use ranks for high card
         
         return (category, groups)
     

@@ -72,6 +72,8 @@ class PokerGame:
         self.player_bet = 0
         self.ai_bet = 0
         self.ai_hidden = True
+        self.player_best_hand = None  # Store best 5-card hand for showdown
+        self.ai_best_hand = None      # Store best 5-card hand for showdown
         self.prob_panel.update({})
 
     def deal_card(self):
@@ -239,16 +241,16 @@ class PokerGame:
         """Compare hands and determine winner."""
         self.ai_hidden = False
         self.phase = self.PHASE_REVEAL
-        p_best = best_hand_from_seven(self.player_hand + self.community)
-        a_best = best_hand_from_seven(self.ai_hand + self.community)
-        p_name = p_best.name()
-        a_name = a_best.name()
+        self.player_best_hand = best_hand_from_seven(self.player_hand + self.community)
+        self.ai_best_hand = best_hand_from_seven(self.ai_hand + self.community)
+        p_name = self.player_best_hand.name()
+        a_name = self.ai_best_hand.name()
         
-        if p_best > a_best:
+        if self.player_best_hand > self.ai_best_hand:
             self.player_chips += self.pot
             self.message = f"BẠN THẮNG!  ({p_name} > {a_name})"
             self.msg_color = GOLD
-        elif a_best > p_best:
+        elif self.ai_best_hand > self.player_best_hand:
             self.ai_chips += self.pot
             self.message = f"AI THẮNG  ({a_name} > {p_name})"
             self.msg_color = RED
@@ -386,7 +388,13 @@ class PokerGame:
         self.draw_info_bar()
         self.draw_cards_row(self.ai_hand, 100, hidden_all=self.ai_hidden, label="May")
         self.draw_community()
-        self.draw_cards_row(self.player_hand, SCREEN_HEIGHT - 230, label="Bạn")
+        
+        # Draw player cards or best hand (during showdown)
+        if self.phase == self.PHASE_REVEAL and self.player_best_hand:
+            self.draw_cards_row(self.player_best_hand.cards, SCREEN_HEIGHT - 230, label="Bạn (Best 5)")
+        else:
+            self.draw_cards_row(self.player_hand, SCREEN_HEIGHT - 230, label="Bạn")
+        
         self.prob_panel.draw(self.screen)
         self.draw_message_bar()
         self.draw_thinking()
