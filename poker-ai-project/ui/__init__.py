@@ -1,4 +1,4 @@
-"""UI module - Game interface and components."""
+"""Mô đun UI - Giao diện và các thành phần trò chơi."""
 
 from .styles import (
     GREEN_FELT, DARK_GREEN, GOLD, WHITE, RED, RED_CARD,

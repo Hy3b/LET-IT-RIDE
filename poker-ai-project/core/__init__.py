@@ -1,4 +1,4 @@
-"""Core poker game logic modules."""
+"""C\u00e1c m\u00f4 \u0111un logic tr\u00f2 ch\u01a1i Poker c\u1eadn b\u1ea3n."""
 
 from .models import Card, Deck, Hand, best_hand_from_seven, RANKS, SUITS, HAND_NAMES
 from .engine import (

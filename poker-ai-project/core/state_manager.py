@@ -1,12 +1,12 @@
-"""Game state management - tracks game phase, bets, cards, history.
-Extracted from poker_ai.py - GameState class for managing round state.
+"""Quản lý trạng thái trò chơi - theo dõi giai đoạn, cược, bài, lịch sử.
+Trích xuất từ poker_ai.py - Lớp GameState quản lý trạng thái vàn.
 """
 
 from .models import Deck
 
 
 class GameState:
-    """Manages complete game state for a poker round."""
+    """Quản lý toàn bộ trạng thái trò chơi cho một vàn poker."""
     
     # Game phases
     PHASE_MENU = 0
@@ -43,7 +43,7 @@ class GameState:
         self.sub_message = ""
     
     def reset_round(self):
-        """Reset state for a new round."""
+        """Lấp lại trạng thái cho một vàn mới."""
         self.deck = Deck()
         self.player_hand = []
         self.ai_hand = []
@@ -59,7 +59,7 @@ class GameState:
         self.sub_message = ""
     
     def start_round(self, blind_amount):
-        """Start a new round with blinds."""
+        """Bắt đầu một vàn mới với blind."""
         self.reset_round()
         
         # Post blinds
@@ -77,15 +77,15 @@ class GameState:
         self.community = self.community_full[:0]  # Start with no community cards
         
         self.phase = self.PHASE_PREFLOP
-        self.message = "Bai da duoc phat! Hay quyet dinh..."
+        self.message = "Bài đã được phát! Hãy quyết định..."
         self.sub_message = f"Blind: {blind_amount} chip"
     
     def post_action(self, action, amount=0):
-        """Record a player action.
+        """Ghi lại một hành động của người chơi.
         
         Args:
             action: "call", "raise", "fold", "check"
-            amount: Chips bet (for raise)
+            amount: Số chip cược (cho raise)
         """
         self.action_history.append({
             'action': action,
@@ -94,7 +94,7 @@ class GameState:
         })
     
     def reveal_next_street(self):
-        """Progress to next betting street."""
+        """Tiến hành sang đợt cược tiếp theo."""
         if self.phase == self.PHASE_PREFLOP:
             self.community = self.community_full[:3]  # Flop
             self.phase = self.PHASE_FLOP
@@ -113,7 +113,7 @@ class GameState:
         return None
     
     def player_call(self):
-        """Player calls."""
+        """Người chơi gọi đáp."""
         call_amount = max(0, self.current_bet - self.player_bet)
         if call_amount > self.player_chips:
             call_amount = self.player_chips  # All-in
@@ -124,7 +124,7 @@ class GameState:
         self.post_action("call", call_amount)
     
     def player_raise(self, raise_amount):
-        """Player raises."""
+        """Người chơi cược lên."""
         if raise_amount > self.player_chips:
             raise_amount = self.player_chips  # All-in
         self.player_chips -= raise_amount
@@ -135,12 +135,12 @@ class GameState:
         self.post_action("raise", raise_amount)
     
     def player_fold(self):
-        """Player folds."""
+        """Người chơi bỏ bài."""
         self.player_last_action = "fold"
         self.post_action("fold", 0)
     
     def ai_call(self):
-        """AI calls."""
+        """AI gọi đáp."""
         call_amount = max(0, self.current_bet - self.ai_bet)
         if call_amount > self.ai_chips:
             call_amount = self.ai_chips  # All-in
@@ -151,7 +151,7 @@ class GameState:
         self.post_action("ai_call", call_amount)
     
     def ai_raise(self, raise_amount):
-        """AI raises."""
+        """AI cược lên."""
         if raise_amount > self.ai_chips:
             raise_amount = self.ai_chips  # All-in
         self.ai_chips -= raise_amount
@@ -162,19 +162,19 @@ class GameState:
         self.post_action("ai_raise", raise_amount)
     
     def ai_fold(self):
-        """AI folds."""
+        """AI bỏ bài."""
         self.ai_last_action = "fold"
         self.post_action("ai_fold", 0)
     
     def get_deck_remaining(self):
-        """Get cards not yet seen by AI."""
+        """Lấy các lá bài chưa được AI nhìn thấy."""
         known = set(self.ai_hand + self.community)
         from .models import SUITS, RANKS
         all_cards = [(r, s) for s in SUITS for r in RANKS]
         return [c for c in all_cards if c not in known]
     
     def get_status(self):
-        """Return current game status summary."""
+        """Trả về tóm tắt trạng thái trò chơi hiện tại."""
         return {
             'phase': self.phase,
             'player_chips': self.player_chips,

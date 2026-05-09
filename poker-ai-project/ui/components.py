@@ -1,5 +1,5 @@
-"""UI Components: Button, Card drawing, Probability Panel.
-Extracted from poker_ai.py - all Pygame-based UI elements.
+"""Các thành phần UI: Button, Vẽ Card, Bảng Xác Suất.
+Trích xuất từ poker_ai.py - tất cả các yếu tố UI dựa trên Pygame.
 """
 
 import pygame
@@ -7,7 +7,7 @@ from .styles import *
 
 
 class Button:
-    """Interactive button with hover effects."""
+    """Nút bấm tương tác với hiệu ứng hover."""
     def __init__(self, x, y, w, h, text, color, text_color=WHITE, font_size=22):
         self.rect = pygame.Rect(x, y, w, h)
         self.text = text
@@ -39,7 +39,7 @@ class Button:
 
 
 def draw_card(surf, rank, suit, x, y, hidden=False):
-    """Draw a single card on the surface."""
+    """Vẽ một lá bài trên đề."""
     rect = pygame.Rect(x, y, CARD_WIDTH, CARD_HEIGHT)
     
     # Shadow effect

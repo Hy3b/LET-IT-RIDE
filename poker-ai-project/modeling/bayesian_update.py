@@ -1,6 +1,6 @@
-"""Bayesian probability updater for opponent hand estimation.
-Uses Bayes' theorem to update probability distribution of opponent's hand
-based on their observed actions and hand strength.
+"""Bộ cập nhật xác suất Bayesian cho ước tính bài của đối thủ.
+Sử dụng định lý Bayes để cập nhật phân phối xác suất của bài đối thủ
+trên cơ sở các hành động được nhìn thấy và sức mạnh bài.
 
 P(Hand | Action) = P(Action | Hand) * P(Hand) / P(Action)
 """
@@ -29,8 +29,8 @@ class BayesianUpdater:
 
     def _mock_ehs_evaluator(self, hand, board_cards):
         """
-        Default EHS estimator when core.engine is not provided.
-        Uses hand strength heuristic based on card values.
+        Bộ ước tính EHS mặc định khi core.engine không được cung cấp.
+        Sử dụng启ô hệuristc của sức mạnh bài dựa trên giá trị lá bài.
         """
         try:
             # Try to use actual EHS from evaluator

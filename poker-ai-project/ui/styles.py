@@ -1,4 +1,4 @@
-"""UI Styling - Colors, dimensions, and constants."""
+"""Styling UI - Màu sắc, kích thước, và hằng số."""
 
 # Colors
 GREEN_FELT = (35, 101, 57)

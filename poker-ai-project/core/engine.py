@@ -1,5 +1,5 @@
-"""Poker game engine - core game flow logic.
-Extracted from poker_ai.py - hand evaluation, pot odds, expected value, outs.
+"""Bộ máy trò chơi Poker - logic luồng trò chơi cơ bản.
+Trích xuất từ poker_ai.py - đánh giá bài, pot odds, expected value, outs.
 """
 
 import random
@@ -7,17 +7,17 @@ from .models import Hand, Deck, best_hand_from_seven, HAND_NAMES
 
 
 def calculate_outs(hole_cards, community_cards):
-    """Count number of outs (cards that improve the hand).
+    """Đếm số lá bài cải thiện (Outs).
     
-    Outs are cards that would improve hand strength to next level.
+    Outs là các lá bài có thể nâng cấp bộ bài lên mức tiếp theo.
     
     Args:
-        hole_cards: 2-tuple of (rank, suit)
-        community_cards: List of (rank, suit) up to 5 cards
+        hole_cards: 2-tuple của (rank, suit)
+        community_cards: Danh sách (rank, suit) tối đa 5 lá
     
     Returns:
-        outs (int): Number of improving cards
-        next_level (str): Name of hand that could be achieved
+        outs (int): Số lá bài cải thiện
+        next_level (str): Tên bộ bài có thể đạt được
     """
     if len(hole_cards + community_cards) < 5:
         return 0, ""
@@ -46,18 +46,18 @@ def calculate_outs(hole_cards, community_cards):
 
 
 def pot_odds(call_amount, pot_size):
-    """Calculate pot odds - required win probability to justify a call.
+    """Tính Pot Odds - xác suất thắng cần thiết để justify một cuộc call.
     
-    Formula: Pot Odds = call_amount / (pot_size + call_amount)
+    Công thức: Pot Odds = call_amount / (pot_size + call_amount)
     
-    If actual_win_prob > pot_odds, then calling has positive expected value.
+    Nếu actual_win_prob > pot_odds, thì call có EV dương.
     
     Args:
-        call_amount: Chips needed to call
-        pot_size: Current pot
+        call_amount: Chip cần để call
+        pot_size: Pot hiện tại
     
     Returns:
-        float: Pot odds in [0, 1]
+        float: Pot odds trong [0, 1]
     """
     total = pot_size + call_amount
     if total == 0:
@@ -66,45 +66,45 @@ def pot_odds(call_amount, pot_size):
 
 
 def expected_value(win_prob, pot, call_amount):
-    """Calculate expected value of a call.
+    """Tính Expected Value của một cuộc call.
     
-    Formula:
+    Công thức:
         EV = P(win) * pot - P(lose) * call_amount
            = win_prob * pot - (1 - win_prob) * call_amount
     
-    EV > 0 means the action has positive expected value (should call).
-    EV < 0 means negative expected value (should fold).
+    EV > 0 nghĩa là hành động có EV dương (nên call).
+    EV < 0 nghĩa là EV âm (nên fold).
     
     Args:
-        win_prob: Estimated probability of winning [0, 1]
-        pot: Total pot if we win
-        call_amount: Chips needed to call
+        win_prob: Xác suất thắng dự tính [0, 1]
+        pot: Pot tổng nếu chúng ta thắng
+        call_amount: Chip cần để call
     
     Returns:
-        float: Expected value in chips
+        float: Expected value tính bằng chip
     """
     return win_prob * pot - (1 - win_prob) * call_amount
 
 
 def monte_carlo_simulation(hole_cards, community_cards, deck_remaining, n_simulations=1000):
-    """Estimate win probability via Monte Carlo simulation.
+    """Ước tính xác suất thắng qua mô phỏng Monte Carlo.
     
-    Algorithm:
-        1. Run n_simulations random games
-        2. For each simulation:
-           - Deal remaining community cards randomly
-           - Deal opponent 2 random cards
-           - Compare hand strengths
-        3. Return win_prob = wins / n_simulations
+    Thuật toán:
+        1. Chạy n_simulations trò chơi ngẫu nhiên
+        2. Cho mỗi mô phỏng:
+           - Lật các lá bài chung còn lại ngẫu nhiên
+           - Phát 2 lá ngẫu nhiên cho đối thủ
+           - So sánh sức mạnh bài
+        3. Trả về win_prob = wins / n_simulations
     
     Args:
-        hole_cards: 2 cards in hand
-        community_cards: 0-5 cards on board
-        deck_remaining: Cards left in deck (excludes known cards)
-        n_simulations: Number of Monte Carlo runs
+        hole_cards: 2 lá trong tay
+        community_cards: 0-5 lá trên bàn
+        deck_remaining: Lá bài còn lại trong bộ (loại trừ lá đã biết)
+        n_simulations: Số lần chạy Monte Carlo
     
     Returns:
-        float: Estimated win probability [0, 1]
+        float: Xác suất thắng dự tính [0, 1]
     """
     wins = 0
     need_community = 5 - len(community_cards)
@@ -132,14 +132,14 @@ def monte_carlo_simulation(hole_cards, community_cards, deck_remaining, n_simula
 
 
 def get_deck_remaining(hole_cards, community_cards):
-    """Get remaining cards in deck (cards not seen by AI).
+    """Lấy các lá bài còn lại trong bộ (lá không được AI nhìn thấy).
     
     Args:
-        hole_cards: AI's 2 cards
-        community_cards: Board cards
+        hole_cards: 2 lá của AI
+        community_cards: Lá bài trên bàn
     
     Returns:
-        list: Remaining (rank, suit) tuples
+        list: Các tuple (rank, suit) còn lại
     """
     from .models import SUITS, RANKS
     known = set(hole_cards + community_cards)

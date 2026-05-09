@@ -1,36 +1,36 @@
-"""Core data models for Poker game.
-Extracted from poker_ai.py - Card, Deck, Hand ranking logic.
+"""Các mô hình dữ liệu cơ bản cho game Poker.
+Chứa: Card, Deck, Hand ranking logic.
 """
 
 import random
 from itertools import combinations
 from collections import Counter
 
-# ── Card Constants ─────────────────────────────────────────────────────────────
-SUITS = ['\u2660', '\u2665', '\u2666', '\u2663']  # Spade, Heart, Diamond, Club
+# ── Hằng số Card ──────────────────────────────────────────────────────────────
+SUITS = ['\u2660', '\u2665', '\u2666', '\u2663']  # Cơ, Tim, Rô, Tép
 RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
-RANK_VALUE = {r: i+2 for i, r in enumerate(RANKS)}  # 2->2, 3->3, ..., A->14
+RANK_VALUE = {r: i+2 for i, r in enumerate(RANKS)}  # Giá trị: 2->2, ..., A->14
 
 HAND_NAMES = [
-    "Bai cao",        # 0: High card
-    "Mot doi",        # 1: One pair
-    "Hai doi",        # 2: Two pairs
-    "Bo ba",          # 3: Three of a kind
-    "Sanh",           # 4: Straight
-    "Thung",          # 5: Flush
-    "Cu lu",          # 6: Full house
-    "Tu quy",         # 7: Four of a kind
-    "Thung sanh"      # 8: Straight flush
+    "Bài cao",        # 0: High card
+    "Một đôi",        # 1: One pair
+    "Hai đôi",        # 2: Two pairs
+    "Ba cây",          # 3: Three of a kind
+    "Sảnh",           # 4: Straight
+    "Thùng",          # 5: Flush
+    "Cù lũ",          # 6: Full house
+    "Tứ quý",         # 7: Four of a kind
+    "Thùng sảnh"      # 8: Straight flush
 ]
 
 
 class Card:
-    """Representation of a playing card."""
+    """Đại diện một lá bài tây."""
     def __init__(self, rank, suit):
         if rank not in RANKS:
-            raise ValueError(f"Invalid rank: {rank}")
+            raise ValueError(f"Rank không hợp lệ: {rank}")
         if suit not in SUITS:
-            raise ValueError(f"Invalid suit: {suit}")
+            raise ValueError(f"Suit không hợp lệ: {suit}")
         self.rank = rank
         self.suit = suit
     
@@ -47,11 +47,11 @@ class Card:
     
     @staticmethod
     def from_string(card_str):
-        """Parse card from string like 'As', 'Kh', '10d', '2c'."""
+        """Parse lá bài từ string như 'As', 'Kh', '10d', '2c'."""
         if len(card_str) < 2:
-            raise ValueError(f"Invalid card string: {card_str}")
+            raise ValueError(f"String lá bài không hợp lệ: {card_str}")
         if card_str[-1] not in 'shdc':
-            raise ValueError(f"Invalid suit in: {card_str}")
+            raise ValueError(f"Suit không hợp lệ: {card_str}")
         
         suit_char = card_str[-1]
         suit_map = {'s': SUITS[0], 'h': SUITS[1], 'd': SUITS[2], 'c': SUITS[3]}
@@ -61,42 +61,42 @@ class Card:
 
 
 class Deck:
-    """Standard 52-card deck."""
+    """Bộ bài chuẩn 52 lá."""
     def __init__(self):
         self.cards = self._create_deck()
         self.shuffle()
     
     def _create_deck(self):
-        """Create a fresh deck of 52 cards."""
+        """Tạo bộ bài mới đầy đủ 52 lá."""
         return [(r, s) for s in SUITS for r in RANKS]
     
     def shuffle(self):
-        """Shuffle the deck."""
+        """Xáo trộn bộ bài."""
         random.shuffle(self.cards)
     
     def draw(self, n=1):
-        """Draw n cards from the deck."""
+        """Lấy n lá bài từ bộ."""
         if n > len(self.cards):
-            raise ValueError(f"Cannot draw {n} cards from {len(self.cards)}-card deck")
+            raise ValueError(f"Không thể lấy {n} lá từ {len(self.cards)} lá còn lại")
         cards = []
         for _ in range(n):
             cards.append(self.cards.pop())
         return cards
     
     def remaining(self):
-        """Return number of remaining cards."""
+        """Trả về số lá bài còn lại."""
         return len(self.cards)
     
     def reset(self):
-        """Reset deck to full."""
+        """Đặt lại bộ bài về đầy đủ."""
         self.cards = self._create_deck()
         self.shuffle()
 
 
 class Hand:
-    """Represents a poker hand."""
+    """Đại diện một bộ bài (5 lá) trong poker."""
     def __init__(self, five_cards):
-        """Initialize with exactly 5 cards."""
+        """Khởi tạo với chính xác 5 lá bài."""
         if len(five_cards) != 5:
             raise ValueError(f"Hand requires 5 cards, got {len(five_cards)}")
         self.cards = five_cards
@@ -104,56 +104,56 @@ class Hand:
     
     @staticmethod
     def _evaluate(five_cards):
-        """Evaluate hand rank. Returns (category, groups)."""
+        """Đánh giá loại bộ bài. Trả về (category, groups)."""
         ranks = sorted([RANK_VALUE[r] for r, s in five_cards], reverse=True)
         suits = [s for r, s in five_cards]
         
-        # Check flush
+        # Kiểm tra Flush
         flush = len(set(suits)) == 1
         
-        # Check straight
+        # Kiểm tra Straight
         straight = (ranks[0] - ranks[4] == 4 and len(set(ranks)) == 5)
-        # Special case: A-2-3-4-5 (wheel)
+        # Trường hợp đặc biệt: A-2-3-4-5 (wheel)
         if set(ranks) == {14, 2, 3, 4, 5}:
             straight, ranks = True, [5, 4, 3, 2, 1]
         
-        # Frequency analysis
+        # Phân tích tần suất
         cnt = Counter(ranks)
         freq = sorted(cnt.values(), reverse=True)
         groups = sorted(cnt.keys(), key=lambda x: (cnt[x], x), reverse=True)
         
-        # Determine hand category
+        # Xác định loại bộ bài
         if straight and flush:
-            category = 8  # Straight flush
-            groups = ranks  # Use ranks for straight flush
+            category = 8  # Thùng sảnh (Straight flush)
+            groups = ranks  # Dùng ranks cho Straight flush
         elif freq == [4, 1]:
-            category = 7  # Four of a kind
+            category = 7  # Tứ quý (Four of a kind)
         elif freq == [3, 2]:
-            category = 6  # Full house
+            category = 6  # Cù lũ (Full house)
         elif flush:
-            category = 5  # Flush
-            groups = ranks  # Use ranks sorted high to low for flush
+            category = 5  # Thùng (Flush)
+            groups = ranks  # Dùng ranks sắp xếp cao->thấp cho Flush
         elif straight:
-            category = 4  # Straight
-            groups = ranks  # Use ranks for straight
+            category = 4  # Sảnh (Straight)
+            groups = ranks  # Dùng ranks cho Straight
         elif freq == [3, 1, 1]:
-            category = 3  # Three of a kind
+            category = 3  # Ba cây (Three of a kind)
         elif freq == [2, 2, 1]:
-            category = 2  # Two pair
+            category = 2  # Hai đôi (Two pair)
         elif freq == [2, 1, 1, 1]:
-            category = 1  # One pair
+            category = 1  # Một đôi (One pair)
         else:
-            category = 0  # High card
-            groups = ranks  # Use ranks for high card
+            category = 0  # Bài cao (High card)
+            groups = ranks  # Dùng ranks cho High card
         
         return (category, groups)
     
     def rank(self):
-        """Return hand rank tuple for comparison."""
+        """Trả về tuple hạng bộ bài để so sánh."""
         return (self.rank_value, self.groups)
     
     def name(self):
-        """Return human-readable hand name."""
+        """Trả về tên bộ bài theo định dạng người đọc."""
         return HAND_NAMES[self.rank_value]
     
     def __gt__(self, other):
@@ -170,13 +170,13 @@ class Hand:
 
 
 def best_hand_from_seven(seven_cards):
-    """Find best 5-card hand from 7 cards.
+    """Tìm bộ bài 5 lá tốt nhất từ 7 lá bài.
     
     Args:
-        seven_cards: List of (rank, suit) tuples
+        seven_cards: Danh sách các tuple (rank, suit)
     
     Returns:
-        Hand: Best hand object
+        Hand: Đối tượng bộ bài tốt nhất
     """
     best = None
     for combo in combinations(seven_cards, 5):
